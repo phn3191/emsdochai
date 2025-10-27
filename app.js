@@ -116,83 +116,83 @@ function formatCurrency(amount) {
 }
 // ==================== HÀM FIREBASE MỚI ====================
 
-// Submit registration (với Firestore)
-async function submitRegistration() {
-  const teamSelect = document.getElementById('teamSelect').value;
-  const employeeSelect = document.getElementById('employeeSelect').value;
+// // Submit registration (với Firestore)
+// async function submitRegistration() {
+//   const teamSelect = document.getElementById('teamSelect').value;
+//   const employeeSelect = document.getElementById('employeeSelect').value;
 
-  if (!teamSelect) return alert('Vui lòng chọn nhóm!');
-  if (!employeeSelect) return alert('Vui lòng chọn nhân viên!');
+//   if (!teamSelect) return alert('Vui lòng chọn nhóm!');
+//   if (!employeeSelect) return alert('Vui lòng chọn nhân viên!');
 
-  // Thu thập sản phẩm đã chọn
-  const selectedProducts = [];
-  products.forEach((product, index) => {
-    const qtyLe = parseInt(document.getElementById(`qty_le_${index}`).value) || 0;
-    const qtyLoc = parseInt(document.getElementById(`qty_loc_${index}`).value) || 0;
+//   // Thu thập sản phẩm đã chọn
+//   const selectedProducts = [];
+//   products.forEach((product, index) => {
+//     const qtyLe = parseInt(document.getElementById(`qty_le_${index}`).value) || 0;
+//     const qtyLoc = parseInt(document.getElementById(`qty_loc_${index}`).value) || 0;
 
-    if (qtyLe > 0 || qtyLoc > 0) {
-      selectedProducts.push({
-        ma_sp: product.ma_sp,
-        ten_sp: product.ten_sp,
-        sl_le: qtyLe,
-        sl_loc: qtyLoc,
-        gia_le: product.gia_le,
-        gia_si: product.gia_si,
-        thanh_tien: (qtyLe * product.gia_le) + (qtyLoc * product.gia_si)
-      });
-    }
-  });
+//     if (qtyLe > 0 || qtyLoc > 0) {
+//       selectedProducts.push({
+//         ma_sp: product.ma_sp,
+//         ten_sp: product.ten_sp,
+//         sl_le: qtyLe,
+//         sl_loc: qtyLoc,
+//         gia_le: product.gia_le,
+//         gia_si: product.gia_si,
+//         thanh_tien: (qtyLe * product.gia_le) + (qtyLoc * product.gia_si)
+//       });
+//     }
+//   });
 
-  if (selectedProducts.length === 0)
-    return alert('Vui lòng chọn ít nhất một sản phẩm!');
+//   if (selectedProducts.length === 0)
+//     return alert('Vui lòng chọn ít nhất một sản phẩm!');
 
-  const totalAmount = selectedProducts.reduce((sum, sp) => sum + sp.thanh_tien, 0);
-  const allowedBudget = currentEmployee.customBudget || currentEmployee.originalBudget;
-  const remaining = allowedBudget - totalAmount;
+//   const totalAmount = selectedProducts.reduce((sum, sp) => sum + sp.thanh_tien, 0);
+//   const allowedBudget = currentEmployee.customBudget || currentEmployee.originalBudget;
+//   const remaining = allowedBudget - totalAmount;
 
-  if (remaining < 0)
-    return alert('Tổng tiền vượt quá ngân sách cho phép!');
+//   if (remaining < 0)
+//     return alert('Tổng tiền vượt quá ngân sách cho phép!');
 
-  try {
-    // 🔍 Kiểm tra nhân viên đã đăng ký chưa
-    const querySnapshot = await db.collection("dangky")
-      .where("tenNhanVien", "==", currentEmployee.name)
-      .get();
+//   try {
+//     // 🔍 Kiểm tra nhân viên đã đăng ký chưa
+//     const querySnapshot = await db.collection("dangky")
+//       .where("tenNhanVien", "==", currentEmployee.name)
+//       .get();
 
-    if (!querySnapshot.empty) {
-      alert("❌ Nhân viên này đã đăng ký rồi!");
-      return;
-    }
+//     if (!querySnapshot.empty) {
+//       alert("❌ Nhân viên này đã đăng ký rồi!");
+//       return;
+//     }
 
-    // ✅ Lưu vào Firestore
-    await db.collection("dangky").add({
-      team: currentEmployee.team,
-      tenNhanVien: currentEmployee.name,
-      allowedBudget: allowedBudget,
-      sanPham: selectedProducts,
-      tong_tien: totalAmount,
-      remaining: remaining,
-      ngay_dang_ky: new Date().toISOString()
-    });
+//     // ✅ Lưu vào Firestore
+//     await db.collection("dangky").add({
+//       team: currentEmployee.team,
+//       tenNhanVien: currentEmployee.name,
+//       allowedBudget: allowedBudget,
+//       sanPham: selectedProducts,
+//       tong_tien: totalAmount,
+//       remaining: remaining,
+//       ngay_dang_ky: new Date().toISOString()
+//     });
 
-    alert("✅ Đăng ký thành công!");
-    // Reset form
-    document.getElementById('teamSelect').value = '';
-    document.getElementById('employeeSelect').innerHTML = '<option value="">-- Chọn nhân viên --</option>';
-    document.getElementById('employeeSelect').disabled = true;
-    document.getElementById('budgetSection').style.display = 'none';
-    currentEmployee = { team: null, name: null, originalBudget: 0, customBudget: null };
-    products.forEach((_, index) => {
-      document.getElementById(`qty_le_${index}`).value = '0';
-      document.getElementById(`qty_loc_${index}`).value = '0';
-    });
-    calculateTotal();
+//     alert("✅ Đăng ký thành công!");
+//     // Reset form
+//     document.getElementById('teamSelect').value = '';
+//     document.getElementById('employeeSelect').innerHTML = '<option value="">-- Chọn nhân viên --</option>';
+//     document.getElementById('employeeSelect').disabled = true;
+//     document.getElementById('budgetSection').style.display = 'none';
+//     currentEmployee = { team: null, name: null, originalBudget: 0, customBudget: null };
+//     products.forEach((_, index) => {
+//       document.getElementById(`qty_le_${index}`).value = '0';
+//       document.getElementById(`qty_loc_${index}`).value = '0';
+//     });
+//     calculateTotal();
 
-  } catch (error) {
-    console.error("Lỗi khi lưu dữ liệu:", error);
-    alert("❌ Không thể kết nối đến Firestore!");
-  }
-}
+//   } catch (error) {
+//     console.error("Lỗi khi lưu dữ liệu:", error);
+//     alert("❌ Không thể kết nối đến Firestore!");
+//   }
+// }
 
 
 // Load employees based on selected team
