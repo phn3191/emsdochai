@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
@@ -8,6 +9,7 @@
     <meta name="theme-color" content="#2563eb">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
@@ -43,7 +45,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="employeeSelect" class="form-label">Chọn nhân viên <span class="required">*</span></label>
+                    <label for="employeeSelect" class="form-label">Chọn nhân viên <span
+                            class="required">*</span></label>
                     <select id="employeeSelect" class="form-control" onchange="loadEmployeeBudget()" required disabled>
                         <option value="">-- Chọn nhân viên --</option>
                     </select>
@@ -54,14 +57,15 @@
                     <div class="budget-header">
                         <h3>💰 Thông tin ngân sách</h3>
                     </div>
-                    
+
                     <div class="budget-customize">
                         <label class="checkbox-label">
-                            <input type="checkbox" id="customizeBudget" onchange="toggleCustomBudget()">
+                            <input id="customizeBudget" onchange="toggleCustomBudget()">
                             <!-- <span>Tùy chỉnh số tiền được mua</span> -->
                         </label>
                         <div id="customBudgetInput" style="display: none;">
-                            <input type="number" id="customBudgetAmount" class="form-control" min="0" step="1000" onchange="updateBudgetDisplay()">
+                            <input type="number" id="customBudgetAmount" class="form-control" min="0" step="1000"
+                                onchange="updateBudgetDisplay()">
                         </div>
                     </div>
 
@@ -246,6 +250,11 @@
         </div>
     </div>
 
+  
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
     <script src="app.js"></script>
+
 </body>
+
 </html>
