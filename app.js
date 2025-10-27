@@ -1,20 +1,31 @@
-// Staff data
-// --- Firebase cấu hình ---
+// ================= FIREBASE KHỞI TẠO =================
 const firebaseConfig = {
-  apiKey: "AIzaSyAYHf7U_uQSjKkbWLq8eGUPQla6Xr9b4q4",
-  authDomain: "dochai-eeaf8.firebaseapp.com",
-  projectId: "dochai-eeaf8",
-  storageBucket: "dochai-eeaf8.firebasestorage.app",
-  messagingSenderId: "133573870183",
-  appId: "1:133573870183:web:e62b26006e93109e0b4ac2",
-  measurementId: "G-C86K29B74Q"
+apiKey: "AIzaSyAYHf7U_uQSjKkbWLq8eGUPQla6Xr9b4q4",
+authDomain: "dochai-eeaf8.firebaseapp.com",
+projectId: "dochai-eeaf8",
+storageBucket: "dochai-eeaf8.appspot.com", // ✅ sửa đúng domain
+messagingSenderId: "133573870183",
+appId: "1:133573870183:web:e62b26006e93109e0b4ac2",
+measurementId: "G-C86K29B74Q"
 };
 
-// --- Khởi tạo Firebase & Firestore ---
+
+// ✅ Khởi tạo Firebase (chỉ 1 lần duy nhất)
+if (!firebase.apps.length) {
 firebase.initializeApp(firebaseConfig);
+}
 const db = firebase.firestore();
 
 
+// ✅ Kiểm tra kết nối Firestore
+db.collection("dangky").get()
+.then(snapshot => {
+console.log("📦 Dữ liệu từ Firestore:");
+snapshot.forEach(doc => console.log(doc.id, "=>", doc.data()));
+})
+.catch(err => {
+console.error("❌ Lỗi Firestore:", err);
+});
 const staff = {
   "Team 1": [
     { name: "Cao Phước Hải", budget: 420000 },
@@ -57,8 +68,6 @@ const staff = {
   ]
 };
 
-
-
 // Current employee budget info
 let currentEmployee = {
   team: null,
@@ -66,6 +75,14 @@ let currentEmployee = {
   originalBudget: 0,
   customBudget: null
 };
+
+function formatCurrency(amount) {
+return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+
+
+
 
 // Product data
 const products = [
@@ -821,6 +838,8 @@ function deleteAllData() {
     alert('Đã xóa tất cả dữ liệu thành công!');
   }
 }
+
+
 
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', () => {
