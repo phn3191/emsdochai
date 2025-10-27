@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Đăng ký ĐH - Mini</title>
+    <meta name="description" content="Hệ thống đăng ký nhu yếu phẩm hàng tháng - Tương thích mọi thiết bị">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">Đăng ký độc hại - EMS Quận 3</div>
+            <div class="nav-menu">
+                <button class="nav-link active" onclick="showPage('register')">Đăng ký</button>
+                <button class="nav-link" onclick="showPage('summary')">Tổng hợp</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Registration Page -->
+        <div id="registerPage" class="page active">
+            <div class="page-header">
+                <h1>Đăng ký sản phẩm</h1>
+                <p class="subtitle">Nhập thông tin và chọn sản phẩm cần đăng ký</p>
+            </div>
+
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="teamSelect" class="form-label">Chọn nhóm <span class="required">*</span></label>
+                    <select id="teamSelect" class="form-control" onchange="loadEmployees()" required>
+                        <option value="">-- Chọn nhóm --</option>
+                        <option value="Team 1">Team 1</option>
+                        <option value="Team 2">Team 2</option>
+                        <option value="Team 3">Team 3</option>
+                        <option value="Team 4">Team 4</option>
+                        <option value="Team 5">Team 5</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="employeeSelect" class="form-label">Chọn nhân viên <span class="required">*</span></label>
+                    <select id="employeeSelect" class="form-control" onchange="loadEmployeeBudget()" required disabled>
+                        <option value="">-- Chọn nhân viên --</option>
+                    </select>
+                </div>
+
+                <!-- Budget Information Section -->
+                <div id="budgetSection" class="budget-section" style="display: none;">
+                    <div class="budget-header">
+                        <h3>💰 Thông tin ngân sách</h3>
+                    </div>
+                    
+                    <div class="budget-customize">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="customizeBudget" onchange="toggleCustomBudget()">
+                            <!-- <span>Tùy chỉnh số tiền được mua</span> -->
+                        </label>
+                        <div id="customBudgetInput" style="display: none;">
+                            <input type="number" id="customBudgetAmount" class="form-control" min="0" step="1000" onchange="updateBudgetDisplay()">
+                        </div>
+                    </div>
+
+                    <div class="budget-info">
+                        <div class="budget-item">
+                            <span class="budget-label">Số tiền được mua:</span>
+                            <span class="budget-value" id="allowedBudget">0 đ</span>
+                        </div>
+                        <div class="budget-item">
+                            <span class="budget-label">Tổng tiền đăng ký:</span>
+                            <span class="budget-value" id="totalRegistration">0 đ</span>
+                        </div>
+                        <div class="budget-item balance-item">
+                            <span class="budget-label">Số dư:</span>
+                            <span class="budget-value balance-value" id="remainingBudget">0 đ</span>
+                        </div>
+                    </div>
+
+                    <div class="budget-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="budgetProgress"></div>
+                        </div>
+                        <div class="progress-text" id="budgetProgressText">0%</div>
+                    </div>
+
+                    <div id="budgetWarning" class="budget-warning" style="display: none;">
+                        ⚠️ Vượt quá ngân sách cho phép!
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="product-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Mã SP</th>
+                                <th>Tên sản phẩm</th>
+                                <th style="width: 120px;">Giá lẻ<br>(1 hộp)</th>
+                                <th style="width: 120px;">Giá sỉ<br>(1 lốc 4 hộp)</th>
+                                <th style="width: 100px;">SL lẻ</th>
+                                <th style="width: 100px;">SL lốc</th>
+                                <th style="width: 130px;">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            <!-- Products will be rendered here -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="text-right"><strong>Tổng tiền đăng ký:</strong></td>
+                                <td><strong id="totalAmount">0 đ</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" onclick="submitRegistration()">
+                        <span>✓</span> Gửi đăng ký
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Page -->
+        <div id="summaryPage" class="page">
+            <div class="page-header">
+                <h1>Tổng hợp đăng ký</h1>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="exportToExcel()">
+                        <span>⬇</span> Xuất Excel
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteAllData()">
+                        <span>🗑</span> Xóa tất cả dữ liệu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sub Tabs -->
+            <div class="tabs">
+                <button class="tab-link active" onclick="showTab('byEmployee')">Theo Nhân Viên</button>
+                <button class="tab-link" onclick="showTab('byProduct')">Theo Sản Phẩm</button>
+                <button class="tab-link" onclick="showTab('byTeam')">Theo Team</button>
+            </div>
+
+            <!-- By Employee Tab -->
+            <div id="byEmployeeTab" class="tab-content active">
+                <div class="table-wrapper">
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">STT</th>
+                                <th style="width: 100px;">Team</th>
+                                <th>Tên nhân viên</th>
+                                <th style="width: 120px;">Ngân sách</th>
+                                <th style="width: 100px;">Mã SP</th>
+                                <th>Tên sản phẩm</th>
+                                <th style="width: 90px;">SL lẻ</th>
+                                <th style="width: 90px;">SL lốc</th>
+                                <th style="width: 130px;">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeSummaryBody">
+                            <!-- Employee summary will be rendered here -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="8" class="text-right"><strong>Tổng tất cả:</strong></td>
+                                <td><strong id="totalByEmployee">0 đ</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- By Team Tab -->
+            <div id="byTeamTab" class="tab-content">
+                <div class="table-wrapper">
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Team</th>
+                                <th style="width: 130px;">Số người đăng ký</th>
+                                <th style="width: 150px;">Tổng ngân sách</th>
+                                <th style="width: 150px;">Tổng tiền đã mua</th>
+                                <th style="width: 150px;">Số dư chung</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamSummaryBody">
+                            <!-- Team summary will be rendered here -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-right"><strong>Tổng tất cả:</strong></td>
+                                <td><strong id="totalSpentByTeam">0 đ</strong></td>
+                                <td><strong id="totalRemainingByTeam">0 đ</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- By Product Tab -->
+            <div id="byProductTab" class="tab-content">
+                <div class="table-wrapper">
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Mã SP</th>
+                                <th>Tên sản phẩm</th>
+                                <th style="width: 110px;">Tổng SL lẻ</th>
+                                <th style="width: 110px;">Tổng SL lốc</th>
+                                <th style="width: 150px;">Tổng thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productSummaryBody">
+                            <!-- Product summary will be rendered here -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-right"><strong>Tổng tất cả:</strong></td>
+                                <td><strong id="totalByProduct">0 đ</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2025 Hệ thống đăng ký nhu yếu phẩm</p>
+        <p class="footer-note">⚠️ Lưu ý: Dữ liệu sẽ bị xóa khi tải lại trang</p>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon">✓</div>
+            <h2>Đăng ký thành công!</h2>
+            <p>Thông tin đăng ký của bạn đã được lưu.</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
