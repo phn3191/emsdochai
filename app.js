@@ -227,8 +227,10 @@ function loadEmployees() {
     originalBudget: 0,
     customBudget: null
   };
+    if (document.getElementById('employeeSelect').value) {
+    updateBudgetDisplay();
+  }
   
-  updateBudgetDisplay();
 }
 
 // Load employee budget information
