@@ -26,6 +26,41 @@ snapshot.forEach(doc => console.log(doc.id, "=>", doc.data()));
 .catch(err => {
 console.error("❌ Lỗi Firestore:", err);
 });
+
+// ✅ NẠP DỮ LIỆU TỪ FIRESTORE VÀO BẢNG TỔNG HỢP
+async function loadRegistrationsFromFirestore() {
+  try {
+    const snapshot = await db.collection("dangky").get();
+    registrations = []; // reset danh sách cũ
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      registrations.push({
+        team: data.team || "Chưa rõ",
+        tenNhanVien: data.tenNhanVien || data.name || "Không tên",
+        allowedBudget: data.allowedBudget || 0,
+        sanPham: data.sanPham || [],
+        tong_tien: data.tong_tien || 0,
+        remaining: data.remaining || 0,
+        ngay_dang_ky: data.ngay_dang_ky || ""
+      });
+    });
+
+    console.log("✅ Đã tải dữ liệu đăng ký:", registrations);
+    renderSummary(); // ⚡ Gọi hàm hiển thị bảng tổng hợp
+  } catch (error) {
+    console.error("❌ Lỗi khi tải dữ liệu:", error);
+  }
+}
+
+// Gọi hàm khi mở trang “Tổng hợp”
+window.addEventListener("DOMContentLoaded", () => {
+  initializeProductTable();
+  calculateTotal();
+  loadRegistrationsFromFirestore(); // 🔥 tải dữ liệu Firestore vào bảng
+});
+
+
 const staff = {
   "Team 1": [
     { name: "Cao Phước Hải", budget: 420000 },
